@@ -12,8 +12,6 @@ export interface Settings {
   captureShots: boolean;
   maxLogEntries: number;
   maxScreenshots: number;
-  theme: 'auto' | 'light' | 'dark';
-  accent: string;
 }
 
 export const DEFAULTS: Settings = {
@@ -24,8 +22,6 @@ export const DEFAULTS: Settings = {
   captureShots: true,
   maxLogEntries: 100,
   maxScreenshots: 30,
-  theme: 'auto',
-  accent: 'green',
 };
 
 export interface LogEntry {

@@ -3,13 +3,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * shadcn/ui default (zinc) theme tokens, light + dark.
- * The action/accent color ("primary") can be re-themed at runtime by setting
- * data-accent on <html> — each accent below is one of shadcn's default theme
- * colors from ui.shadcn.com/themes.
+ * shadcn/ui default (zinc) theme tokens, light + dark, with the action color
+ * ("primary") fixed to shadcn's green theme via data-accent="green" set at
+ * startup. --radius is raised for the bubbly GNOME/Material-style look.
  */
 :root {
-  --radius: 0.625rem;
+  --radius: 0.875rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -28,6 +27,8 @@
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.705 0.015 286.067);
+  /* page behind the bubbles */
+  --canvas: oklch(0.955 0.002 286.35);
 }
 
 .dark {
@@ -49,10 +50,10 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.552 0.016 285.938);
+  --canvas: oklch(0.115 0.005 285.823);
 }
 
-/* --- Action color themes (override primary/ring only) ------------------- */
-
+/* Fixed action color: shadcn's green theme. */
 :root[data-accent="green"] {
   --primary: oklch(0.627 0.194 149.214);
   --primary-foreground: oklch(0.982 0.018 155.826);
@@ -62,72 +63,6 @@
   --primary: oklch(0.723 0.219 149.579);
   --primary-foreground: oklch(0.266 0.065 152.934);
   --ring: oklch(0.723 0.219 149.579);
-}
-
-:root[data-accent="blue"] {
-  --primary: oklch(0.546 0.245 262.881);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --ring: oklch(0.546 0.245 262.881);
-}
-.dark[data-accent="blue"] {
-  --primary: oklch(0.623 0.214 259.815);
-  --primary-foreground: oklch(0.282 0.091 267.935);
-  --ring: oklch(0.623 0.214 259.815);
-}
-
-:root[data-accent="red"] {
-  --primary: oklch(0.577 0.245 27.325);
-  --primary-foreground: oklch(0.971 0.013 17.38);
-  --ring: oklch(0.577 0.245 27.325);
-}
-.dark[data-accent="red"] {
-  --primary: oklch(0.637 0.237 25.331);
-  --primary-foreground: oklch(0.971 0.013 17.38);
-  --ring: oklch(0.637 0.237 25.331);
-}
-
-:root[data-accent="rose"] {
-  --primary: oklch(0.586 0.253 17.585);
-  --primary-foreground: oklch(0.969 0.015 12.422);
-  --ring: oklch(0.586 0.253 17.585);
-}
-.dark[data-accent="rose"] {
-  --primary: oklch(0.645 0.246 16.439);
-  --primary-foreground: oklch(0.969 0.015 12.422);
-  --ring: oklch(0.645 0.246 16.439);
-}
-
-:root[data-accent="orange"] {
-  --primary: oklch(0.646 0.222 41.116);
-  --primary-foreground: oklch(0.98 0.016 73.684);
-  --ring: oklch(0.646 0.222 41.116);
-}
-.dark[data-accent="orange"] {
-  --primary: oklch(0.705 0.213 47.604);
-  --primary-foreground: oklch(0.266 0.079 36.259);
-  --ring: oklch(0.705 0.213 47.604);
-}
-
-:root[data-accent="violet"] {
-  --primary: oklch(0.541 0.281 293.009);
-  --primary-foreground: oklch(0.969 0.016 293.756);
-  --ring: oklch(0.541 0.281 293.009);
-}
-.dark[data-accent="violet"] {
-  --primary: oklch(0.606 0.25 292.717);
-  --primary-foreground: oklch(0.969 0.016 293.756);
-  --ring: oklch(0.606 0.25 292.717);
-}
-
-:root[data-accent="yellow"] {
-  --primary: oklch(0.795 0.184 86.047);
-  --primary-foreground: oklch(0.286 0.066 53.813);
-  --ring: oklch(0.795 0.184 86.047);
-}
-.dark[data-accent="yellow"] {
-  --primary: oklch(0.795 0.184 86.047);
-  --primary-foreground: oklch(0.286 0.066 53.813);
-  --ring: oklch(0.795 0.184 86.047);
 }
 
 @theme inline {
@@ -153,6 +88,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-canvas: var(--canvas);
 }
 
 @layer base {
@@ -160,6 +96,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-canvas text-foreground;
   }
 }

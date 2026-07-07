@@ -1,14 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 
-import { AppearanceRow } from '@/components/appearance';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { api, send, type Settings } from '@/lib/ext';
-import { applyAppearance, type Mode } from '@/lib/theme';
 
 interface PopupState {
   settings: Settings;
@@ -22,13 +19,21 @@ interface PopupState {
   watched: boolean;
 }
 
+/* A rounded section "bubble", GNOME/Material style: rows inside, hairline
+ * dividers between them, gaps all around the outside. */
+function Bubble({ children }: { children: ReactNode }) {
+  return <section className="divide-border/60 bg-card divide-y rounded-3xl px-4 py-1">{children}</section>;
+}
+
+function Row({ children }: { children: ReactNode }) {
+  return <div className="flex min-h-12 items-center justify-between gap-3 py-2">{children}</div>;
+}
+
 export function Popup() {
   const [state, setState] = useState<PopupState | null>(null);
 
   const refresh = useCallback(async () => {
-    const next = await send<PopupState>({ type: 'popup:getState' });
-    applyAppearance(next.settings.theme, next.settings.accent);
-    setState(next);
+    setState(await send<PopupState>({ type: 'popup:getState' }));
   }, []);
 
   useEffect(() => {
@@ -61,18 +66,6 @@ export function Popup() {
     refresh();
   };
 
-  const setTheme = async (theme: Mode) => {
-    applyAppearance(theme, settings.accent);
-    await send({ type: 'popup:setTheme', theme });
-    refresh();
-  };
-
-  const setAccent = async (accent: string) => {
-    applyAppearance(settings.theme, accent);
-    await send({ type: 'popup:setAccent', accent });
-    refresh();
-  };
-
   const grant = async () => {
     try {
       await api.permissions.request({ origins: ['<all_urls>'] });
@@ -91,29 +84,30 @@ export function Popup() {
         : 'This tab is not being watched.';
 
   return (
-    <div className="w-[300px] p-4 text-sm">
-      <header className="mb-3 flex items-center gap-2">
+    <div className="flex w-[300px] flex-col gap-3 p-3 text-sm">
+      <header className="flex items-center gap-2 px-2 pt-1">
         <img src="./icons/icon32.png" alt="" className="size-5" />
         <h1 className="flex-1 text-[15px] font-semibold">Auto Approve</h1>
-        <Badge title="Total buttons clicked">{state.clicks}</Badge>
+        <Badge className="rounded-full" title="Total buttons clicked">
+          {state.clicks}
+        </Badge>
       </header>
 
       {!state.hostAccess && (
-        <div className="border-destructive/40 bg-destructive/10 mb-3 rounded-md border p-2.5 text-xs">
+        <section className="border-destructive/40 bg-destructive/10 rounded-3xl border p-3.5 text-xs">
           This extension needs access to websites to work.
-          <Button variant="outline" size="sm" className="mt-2 w-full" onClick={grant}>
+          <Button variant="outline" size="sm" className="mt-2 w-full rounded-full" onClick={grant}>
             Grant site access
           </Button>
-        </div>
+        </section>
       )}
 
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center justify-between py-1.5">
+      <Bubble>
+        <Row>
           <Label htmlFor="enabled">Extension enabled</Label>
           <Switch id="enabled" checked={settings.enabled} onCheckedChange={setEnabled} />
-        </div>
-
-        <div className="flex items-center justify-between py-1.5">
+        </Row>
+        <Row>
           <Label htmlFor="interval">Scan every</Label>
           <div className="flex items-center gap-1.5">
             <Input
@@ -121,59 +115,49 @@ export function Popup() {
               type="number"
               min={2}
               max={60}
-              className="h-8 w-16 text-right"
+              className="h-8 w-16 rounded-full text-right"
               defaultValue={settings.intervalSec}
               onBlur={(e) => setInterval(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && setInterval((e.target as HTMLInputElement).value)}
             />
             <span className="text-muted-foreground">s</span>
           </div>
-        </div>
-      </div>
+        </Row>
+      </Bubble>
 
-      <Separator className="my-2" />
-
-      <div className="flex flex-col gap-1" data-disabled={!state.tabWatchable}>
-        <div className="flex items-center justify-between py-1.5">
+      <Bubble>
+        <Row>
           <Label htmlFor="watch" className={!state.tabWatchable ? 'opacity-50' : ''}>
             Watch this tab
           </Label>
           <Switch id="watch" disabled={!state.tabWatchable} checked={state.manuallyWatched} onCheckedChange={setWatch} />
-        </div>
-
+        </Row>
         {state.groupsSupported && (
           <>
-            <div className="flex items-center justify-between py-1.5">
+            <Row>
               <Label htmlFor="group" className={!state.tabWatchable ? 'opacity-50' : ''}>
                 In “Auto-Approve” tab group
               </Label>
               <Switch id="group" disabled={!state.tabWatchable} checked={state.inGroup} onCheckedChange={setGroup} />
-            </div>
-            <p className="text-muted-foreground text-xs">
+            </Row>
+            <p className="text-muted-foreground py-2.5 text-xs">
               Any tab moved into the “Auto-Approve” group is watched automatically.
             </p>
           </>
         )}
-      </div>
+      </Bubble>
 
-      <p className={`mt-2 min-h-4 text-xs ${state.watched && settings.enabled ? 'font-medium text-primary' : 'text-muted-foreground'}`}>
-        {status}
-      </p>
+      <section className="bg-card rounded-3xl px-4 py-3">
+        <p className={`text-xs ${state.watched && settings.enabled ? 'font-medium text-primary' : 'text-muted-foreground'}`}>
+          {status}
+        </p>
+      </section>
 
-      <Separator className="my-2" />
-
-      <AppearanceRow theme={settings.theme} accent={settings.accent} onTheme={setTheme} onAccent={setAccent} />
-
-      <Separator className="my-2" />
-
-      <Button
-        variant="link"
-        size="sm"
-        className="h-auto p-0 text-xs"
-        onClick={() => api.runtime.openOptionsPage()}
-      >
-        Keywords, log &amp; screenshots →
-      </Button>
+      <footer className="px-2 pb-1">
+        <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={() => api.runtime.openOptionsPage()}>
+          Keywords, log &amp; screenshots →
+        </Button>
+      </footer>
     </div>
   );
 }

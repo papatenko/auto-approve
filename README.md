@@ -10,10 +10,9 @@ Nothing ever leaves your browser: the log and screenshots are stored locally
 in extension storage.
 
 The popup and options pages are built with **React + [shadcn/ui](https://ui.shadcn.com)**
-(Tailwind CSS v4), using shadcn's default zinc theme with light/dark mode and a
-switchable **action color** (zinc, red, rose, orange, green, blue, yellow,
-violet — shadcn's default theme colors). The action color drives the switches,
-buttons, badge, and even the toolbar badge color.
+(Tailwind CSS v4) in a bubbly, GNOME/Material-You-inspired layout: rounded
+section cards floating on a muted background. Light/dark mode follows your OS
+automatically; the action color is shadcn's green theme.
 
 ## Features
 
@@ -34,11 +33,9 @@ buttons, badge, and even the toolbar badge color.
 - **Screenshot audit log** — each sweep that clicked something adds a log entry
   (which buttons, page, time) plus a JPEG screenshot of the visible tab.
   Browse, zoom, and clear it from the options page.
-- **Light & dark mode + action colors** — follows your OS by default, with a
-  manual Auto / Light / Dark picker and an accent color picker in both the
-  popup and the options page.
-- **Badge** shows how many tabs are currently being watched (in your chosen
-  action color), or `off` when the extension is paused.
+- **Light & dark mode** — follows your OS automatically.
+- **Badge** shows how many tabs are currently being watched, or `off` when the
+  extension is paused.
 
 ## Build
 
@@ -107,7 +104,7 @@ ui/                    # popup + options pages: React + shadcn/ui + Tailwind v4
   src/components/ui/   # shadcn components (button, switch, select, card, …)
   src/popup/           # toolbar popup
   src/options/         # settings + click log page
-  src/globals.css      # shadcn zinc theme tokens + action color themes
+  src/globals.css      # shadcn zinc theme tokens + green action color
 build.sh               # builds UI, assembles dist/chrome, dist/firefox + zips
 tools/make_icons.py    # regenerates icons (stdlib-only Python)
 ```

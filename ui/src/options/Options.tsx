@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { AccentPicker, ModeSelect } from '@/components/appearance';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { api, DEFAULTS, getSettings, saveSettings, type LogEntry, type Settings } from '@/lib/ext';
-import { applyAppearance, type Mode } from '@/lib/theme';
+
+/* Bubble look: big radius, no border/shadow, floating on the muted canvas. */
+const BUBBLE = 'rounded-3xl border-0 shadow-none';
 
 export function Options() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -20,7 +21,6 @@ export function Options() {
 
   const loadSettings = useCallback(async () => {
     const s = await getSettings();
-    applyAppearance(s.theme, s.accent);
     setSettings(s);
     setKeywordsText(s.keywords.join('\n'));
   }, []);
@@ -37,10 +37,6 @@ export function Options() {
     const onChanged = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
       if (area !== 'local') return;
       if (changes.clickLog || changes.stats) loadLog();
-      if (changes.settings) {
-        const next = (changes.settings.newValue || {}) as Partial<Settings>;
-        applyAppearance(next.theme, next.accent);
-      }
     };
     api.storage.onChanged.addListener(onChanged);
     return () => api.storage.onChanged.removeListener(onChanged);
@@ -72,13 +68,13 @@ export function Options() {
   };
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-8">
-      <header className="flex items-center gap-3">
+    <main className="mx-auto flex max-w-3xl flex-col gap-5 px-5 py-8">
+      <header className="flex items-center gap-3 px-2">
         <img src="./icons/icon48.png" alt="" className="size-8" />
         <h1 className="text-2xl font-semibold tracking-tight">Auto Approve</h1>
       </header>
 
-      <Card>
+      <Card className={BUBBLE}>
         <CardHeader>
           <CardTitle>Button keywords</CardTitle>
           <CardDescription>
@@ -90,7 +86,7 @@ export function Options() {
             value={keywordsText}
             onChange={(e) => setKeywordsText(e.target.value)}
             spellCheck={false}
-            className="max-w-xs font-mono"
+            className="max-w-xs rounded-2xl font-mono"
             rows={9}
           />
 
@@ -121,7 +117,7 @@ export function Options() {
               type="number"
               min={2}
               max={60}
-              className="w-20"
+              className="w-20 rounded-full"
               value={settings.intervalSec}
               onChange={(e) => setSettings({ ...settings, intervalSec: Number(e.target.value) })}
             />
@@ -129,43 +125,15 @@ export function Options() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button onClick={save}>Save settings</Button>
+            <Button className="rounded-full" onClick={save}>
+              Save settings
+            </Button>
             {savedFlash && <span className="text-sm font-medium text-primary">Saved ✓</span>}
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Appearance</CardTitle>
-          <CardDescription>Light/dark mode and the action color used across the extension.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <Label className="font-normal">Mode</Label>
-            <ModeSelect
-              size="default"
-              value={settings.theme}
-              onChange={(theme: Mode) => {
-                applyAppearance(theme, settings.accent);
-                patch({ theme });
-              }}
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <Label className="font-normal">Action color</Label>
-            <AccentPicker
-              value={settings.accent}
-              onChange={(accent) => {
-                applyAppearance(settings.theme, accent);
-                patch({ accent });
-              }}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
+      <Card className={BUBBLE}>
         <CardHeader>
           <CardTitle>
             Click log{' '}
@@ -179,7 +147,7 @@ export function Options() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div>
-            <Button variant="outline" onClick={clearLog}>
+            <Button variant="outline" className="rounded-full" onClick={clearLog}>
               Clear log
             </Button>
           </div>
@@ -187,7 +155,7 @@ export function Options() {
           {log.length === 0 ? (
             <p className="text-muted-foreground py-4 text-sm">No clicks recorded yet.</p>
           ) : (
-            <div className="flex flex-col divide-y">
+            <div className="divide-border/60 flex flex-col divide-y">
               {log.map((entry, i) => {
                 const texts = Array.isArray(entry.texts) ? entry.texts : [entry.text ?? ''];
                 return (
@@ -213,8 +181,8 @@ export function Options() {
                         onClick={() => setZoomed(zoomed === i ? null : i)}
                         className={
                           zoomed === i
-                            ? 'w-full max-w-xl cursor-zoom-out rounded-md border'
-                            : 'w-44 shrink-0 cursor-zoom-in self-start rounded-md border'
+                            ? 'w-full max-w-xl cursor-zoom-out rounded-2xl'
+                            : 'w-44 shrink-0 cursor-zoom-in self-start rounded-2xl'
                         }
                       />
                     )}

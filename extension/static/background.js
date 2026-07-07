@@ -18,20 +18,6 @@ const DEFAULTS = {
   captureShots: true,
   maxLogEntries: 100,
   maxScreenshots: 30,
-  theme: 'auto',
-  accent: 'green',
-};
-
-// Badge colors matching the shadcn accent themes selectable in the UI.
-const ACCENT_BADGE_COLORS = {
-  zinc: '#52525b',
-  red: '#dc2626',
-  rose: '#e11d48',
-  orange: '#ea580c',
-  green: '#16a34a',
-  blue: '#2563eb',
-  yellow: '#ca8a04',
-  violet: '#7c3aed',
 };
 
 const TAB_GROUP_TITLE = 'Auto-Approve';
@@ -120,9 +106,7 @@ async function updateBadge() {
     }
     const count = await watchedTabCount();
     await api.action.setBadgeText({ text: count > 0 ? String(count) : '' });
-    await api.action.setBadgeBackgroundColor({
-      color: ACCENT_BADGE_COLORS[settings.accent] || ACCENT_BADGE_COLORS.green,
-    });
+    await api.action.setBadgeBackgroundColor({ color: '#16a34a' });
   } catch (e) {
     /* action API can be unavailable in rare contexts */
   }
@@ -276,23 +260,6 @@ async function handleMessage(msg, sender) {
       settings.intervalSec = sec;
       await api.storage.local.set({ settings });
       return { ok: true, intervalSec: sec };
-    }
-
-    case 'popup:setTheme': {
-      const settings = await getSettings();
-      settings.theme = ['light', 'dark'].includes(msg.theme) ? msg.theme : 'auto';
-      await api.storage.local.set({ settings });
-      return { ok: true };
-    }
-
-    case 'popup:setAccent': {
-      const settings = await getSettings();
-      settings.accent = Object.prototype.hasOwnProperty.call(ACCENT_BADGE_COLORS, msg.accent)
-        ? msg.accent
-        : DEFAULTS.accent;
-      await api.storage.local.set({ settings });
-      await updateBadge();
-      return { ok: true };
     }
 
     case 'popup:watchTab': {
