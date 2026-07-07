@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Minus, Plus } from 'lucide-react';
 
 import { AccentPicker, ModeSelect } from '@/components/appearance';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { applyAppearance, type Mode } from '@/lib/theme';
 export function Options() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [keywordsText, setKeywordsText] = useState('');
+  const [intervalDraft, setIntervalDraft] = useState('');
   const [log, setLog] = useState<LogEntry[]>([]);
   const [totalClicks, setTotalClicks] = useState(0);
   const [savedFlash, setSavedFlash] = useState(false);
@@ -23,6 +25,7 @@ export function Options() {
     applyAppearance(s.theme, s.accent);
     setSettings(s);
     setKeywordsText(s.keywords.join('\n'));
+    setIntervalDraft(String(s.intervalSec));
   }, []);
 
   const loadLog = useCallback(async () => {
@@ -54,15 +57,25 @@ export function Options() {
     await saveSettings(next);
   };
 
+  const setIntervalValue = (value: string | number) => {
+    const parsed = Number(value);
+    const intervalSec = Number.isFinite(parsed)
+      ? Math.min(60, Math.max(2, parsed))
+      : settings.intervalSec;
+    setIntervalDraft(String(intervalSec));
+    setSettings({ ...settings, intervalSec });
+  };
+
   const save = async () => {
     let keywords = keywordsText
       .split('\n')
       .map((k) => k.replace(/\s+/g, ' ').trim().toLowerCase())
       .filter(Boolean);
     if (keywords.length === 0) keywords = [...DEFAULTS.keywords];
-    const intervalSec = Math.min(60, Math.max(2, Number(settings.intervalSec) || DEFAULTS.intervalSec));
+    const intervalSec = Math.min(60, Math.max(2, Number(intervalDraft) || DEFAULTS.intervalSec));
     await patch({ keywords, intervalSec });
     setKeywordsText(keywords.join('\n'));
+    setIntervalDraft(String(intervalSec));
     setSavedFlash(true);
     setTimeout(() => setSavedFlash(false), 2000);
   };
@@ -116,15 +129,37 @@ export function Options() {
             <Label htmlFor="interval" className="font-normal">
               Scan interval
             </Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Decrease scan interval"
+              className="size-8"
+              onClick={() => setIntervalValue(settings.intervalSec - 1)}
+            >
+              <Minus className="size-3.5" />
+            </Button>
             <Input
               id="interval"
-              type="number"
-              min={2}
-              max={60}
-              className="w-20"
-              value={settings.intervalSec}
-              onChange={(e) => setSettings({ ...settings, intervalSec: Number(e.target.value) })}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              className="h-8 w-10 px-2 text-center"
+              value={intervalDraft}
+              onChange={(e) => setIntervalDraft(e.target.value.replace(/\D/g, ''))}
+              onBlur={(e) => setIntervalValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && setIntervalValue((e.target as HTMLInputElement).value)}
             />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Increase scan interval"
+              className="size-8"
+              onClick={() => setIntervalValue(settings.intervalSec + 1)}
+            >
+              <Plus className="size-3.5" />
+            </Button>
             <span className="text-muted-foreground text-sm">seconds</span>
           </div>
 
