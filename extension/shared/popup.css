@@ -1,0 +1,214 @@
+:root {
+  --green: #16a34a;
+  /* light palette (default) */
+  --bg: #ffffff;
+  --fg: #1f2430;
+  --border: #dfe3e8;
+  --muted: #6b7280;
+  --danger-bg: #fdecec;
+  --danger-border: #f3b4b4;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e222a;
+    --fg: #e7eaf0;
+    --border: #3a4150;
+    --muted: #9aa3b2;
+    --danger-bg: #3a2326;
+    --danger-border: #7f3b41;
+    color-scheme: dark;
+  }
+}
+
+/* Manual override from the theme picker beats the OS preference. */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #1f2430;
+  --border: #dfe3e8;
+  --muted: #6b7280;
+  --danger-bg: #fdecec;
+  --danger-border: #f3b4b4;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #1e222a;
+  --fg: #e7eaf0;
+  --border: #3a4150;
+  --muted: #9aa3b2;
+  --danger-bg: #3a2326;
+  --danger-border: #7f3b41;
+  color-scheme: dark;
+}
+
+body {
+  font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 12px 14px;
+  width: 280px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 15px;
+  margin: 0;
+  flex: 1;
+}
+
+.clicks {
+  background: var(--green);
+  color: #fff;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.row.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 8px 0;
+}
+
+.switch {
+  appearance: none;
+  width: 34px;
+  height: 19px;
+  border-radius: 999px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin: 0;
+  flex: none;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: left 0.15s;
+}
+
+.switch:checked {
+  background: var(--green);
+}
+
+.switch:checked::after {
+  left: 17px;
+}
+
+input[type="number"],
+select {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 4px;
+}
+
+.interval input {
+  width: 52px;
+  text-align: right;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 16px;
+  margin-top: 4px;
+}
+
+.status.active {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.warning {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.warning button {
+  display: block;
+  margin-top: 6px;
+  width: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+footer a {
+  color: inherit;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+.theme-pick {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}

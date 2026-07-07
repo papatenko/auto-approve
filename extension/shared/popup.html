@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon32.png" alt="" width="20" height="20">
+    <h1>Auto Accept</h1>
+    <span id="clicks" class="clicks" title="Total buttons clicked">0</span>
+  </header>
+
+  <div id="perm-warning" class="warning hidden">
+    This extension needs access to websites to work.
+    <button id="grant">Grant site access</button>
+  </div>
+
+  <label class="row">
+    <span>Extension enabled</span>
+    <input type="checkbox" id="enabled" class="switch">
+  </label>
+
+  <label class="row">
+    <span>Scan every</span>
+    <span class="interval">
+      <input type="number" id="interval" min="2" max="60" step="1"> s
+    </span>
+  </label>
+
+  <hr>
+
+  <label class="row" id="watch-row">
+    <span>Watch this tab</span>
+    <input type="checkbox" id="watch" class="switch">
+  </label>
+
+  <label class="row" id="group-row">
+    <span>In “Auto-Accept” tab group</span>
+    <input type="checkbox" id="group" class="switch">
+  </label>
+  <p class="hint" id="group-hint">Any tab moved into the green “Auto-Accept” group is watched automatically.</p>
+
+  <div id="status" class="status"></div>
+
+  <footer>
+    <a href="#" id="open-options">Keywords, log &amp; screenshots →</a>
+    <label class="theme-pick">
+      <select id="theme" title="Popup theme">
+        <option value="auto">Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>
