@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Auto Approve",
+  "version": "1.1.0",
+  "description": "Watches the tabs you choose and automatically clicks Accept / Approve / Yes style buttons on an interval, keeping a screenshot audit log of every click.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "auto-approve@papatenko",
+      "strict_min_version": "115.0"
+    }
+  },
+  "permissions": ["tabs", "tabGroups", "storage", "unlimitedStorage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Auto Approve",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
