@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Auto Accept",
-  "version": "1.0.0",
+  "name": "Auto Approve",
+  "version": "1.1.0",
   "description": "Watches the tabs you choose and automatically clicks Accept / Approve / Yes style buttons on an interval, keeping a screenshot audit log of every click.",
   "permissions": ["tabs", "tabGroups", "storage", "unlimitedStorage"],
   "host_permissions": ["<all_urls>"],
@@ -18,7 +18,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Auto Accept",
+    "default_title": "Auto Approve",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

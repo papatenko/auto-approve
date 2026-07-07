@@ -1,5 +1,5 @@
 /*
- * Auto Accept — content script.
+ * Auto Approve — content script.
  * Runs in every frame, but stays dormant until the background script marks
  * this tab as watched. While watched (and the extension is enabled), it scans
  * the DOM on the configured interval and clicks buttons whose text matches

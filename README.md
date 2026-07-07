@@ -1,4 +1,4 @@
-# Auto Accept
+# Auto Approve
 
 A Chrome + Firefox extension that watches the tabs you choose and automatically
 clicks **Accept / Approve / Yes / Allow / Confirm / OK / Continue** style
@@ -8,6 +8,12 @@ and records a click log with a **screenshot** of the tab as an audit trail.
 
 Nothing ever leaves your browser: the log and screenshots are stored locally
 in extension storage.
+
+The popup and options pages are built with **React + [shadcn/ui](https://ui.shadcn.com)**
+(Tailwind CSS v4), using shadcn's default zinc theme with light/dark mode and a
+switchable **action color** (zinc, red, rose, orange, green, blue, yellow,
+violet — shadcn's default theme colors). The action color drives the switches,
+buttons, badge, and even the toolbar badge color.
 
 ## Features
 
@@ -21,27 +27,31 @@ in extension storage.
   like "Accept all").
 - **Two ways to watch a tab**:
   - toggle **"Watch this tab"** in the toolbar popup, or
-  - put tabs in the green **"Auto-Accept" tab group** (created via the popup) —
+  - put tabs in the **"Auto-Approve" tab group** (created via the popup) —
     every tab in the group is watched automatically. Tab groups work in Chrome
     and Firefox 139+; on older Firefox the group row is hidden and per-tab
     watching still works.
 - **Screenshot audit log** — each sweep that clicked something adds a log entry
   (which buttons, page, time) plus a JPEG screenshot of the visible tab.
   Browse, zoom, and clear it from the options page.
-- **Light & dark mode** — follows your OS by default, with a manual
-  Auto / Light / Dark picker in the popup.
-- **Badge** shows how many tabs are currently being watched, or `off` when the
-  extension is paused.
+- **Light & dark mode + action colors** — follows your OS by default, with a
+  manual Auto / Light / Dark picker and an accent color picker in both the
+  popup and the options page.
+- **Badge** shows how many tabs are currently being watched (in your chosen
+  action color), or `off` when the extension is paused.
 
 ## Build
+
+Requires Node 18+.
 
 ```sh
 ./build.sh
 ```
 
-This assembles `dist/chrome/` and `dist/firefox/` (shared code +
-browser-specific manifest) and zips each. Icons are pre-generated; regenerate
-them with `python3 tools/make_icons.py`.
+This installs UI dependencies on first run, builds the React UI with Vite,
+then assembles `dist/chrome/` and `dist/firefox/` (built UI + background &
+content scripts + browser-specific manifest) and zips each. Icons are
+pre-generated; regenerate them with `python3 tools/make_icons.py`.
 
 ## Install
 
@@ -56,10 +66,10 @@ them with `python3 tools/make_icons.py`.
 1. Run `./build.sh`.
 2. Open `about:debugging#/runtime/this-firefox`.
 3. Click **Load Temporary Add-on…** and pick `dist/firefox/manifest.json`
-   (or install `dist/auto-accept-firefox.zip` as an unsigned add-on in
+   (or install `dist/auto-approve-firefox.zip` as an unsigned add-on in
    Developer Edition/Nightly via `xpinstall.signatures.required = false`).
 4. **Important (Firefox MV3):** host permissions are opt-in. Open
-   `about:addons` → Auto Accept → **Permissions** and enable
+   `about:addons` → Auto Approve → **Permissions** and enable
    *Access your data for all websites*, or click **Grant site access** in the
    popup when prompted. Without this the content script cannot run.
 
@@ -67,7 +77,7 @@ them with `python3 tools/make_icons.py`.
 
 1. Click the toolbar icon.
 2. Flip **Watch this tab** on the tab you want automated (or add it to the
-   Auto-Accept tab group).
+   Auto-Approve tab group).
 3. Leave it running. The badge counts watched tabs; the popup shows total
    clicks; the options page has the full log with screenshots.
 4. Flip **Extension enabled** off (or unwatch the tab) to stop.
@@ -87,14 +97,17 @@ them with `python3 tools/make_icons.py`.
 
 ```
 extension/
-  shared/              # all extension code, shared verbatim by both browsers
+  static/              # non-UI extension code, shared by both browsers
     background.js      # watched-tab state, tab group, click log, screenshots
     content.js         # interval scanner + clicker (runs in every frame)
-    popup.{html,js,css}
-    options.{html,js,css}
     icons/
   manifest.chrome.json   # MV3, service worker background
   manifest.firefox.json  # MV3, event-page background + gecko id
-build.sh               # assembles dist/chrome, dist/firefox + zips
+ui/                    # popup + options pages: React + shadcn/ui + Tailwind v4
+  src/components/ui/   # shadcn components (button, switch, select, card, …)
+  src/popup/           # toolbar popup
+  src/options/         # settings + click log page
+  src/globals.css      # shadcn zinc theme tokens + action color themes
+build.sh               # builds UI, assembles dist/chrome, dist/firefox + zips
 tools/make_icons.py    # regenerates icons (stdlib-only Python)
 ```
