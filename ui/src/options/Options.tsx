@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { api, DEFAULTS, getSettings, saveSettings, type LogEntry, type Settings } from '@/lib/ext';
+import { applyMode } from '@/lib/theme';
 
 /* Bubble look: big radius, no border/shadow, floating on the muted canvas. */
 const BUBBLE = 'rounded-3xl border-0 shadow-none';
@@ -21,6 +23,7 @@ export function Options() {
 
   const loadSettings = useCallback(async () => {
     const s = await getSettings();
+    applyMode(s.theme);
     setSettings(s);
     setKeywordsText(s.keywords.join('\n'));
   }, []);
@@ -37,6 +40,7 @@ export function Options() {
     const onChanged = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
       if (area !== 'local') return;
       if (changes.clickLog || changes.stats) loadLog();
+      if (changes.settings) applyMode((changes.settings.newValue as Partial<Settings>)?.theme ?? 'auto');
     };
     api.storage.onChanged.addListener(onChanged);
     return () => api.storage.onChanged.removeListener(onChanged);
@@ -129,6 +133,25 @@ export function Options() {
               Save settings
             </Button>
             {savedFlash && <span className="text-sm font-medium text-primary">Saved ✓</span>}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className={BUBBLE}>
+        <CardHeader>
+          <CardTitle>Appearance</CardTitle>
+          <CardDescription>Light or dark mode for the extension. Auto follows your system setting.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-3">
+            <Label className="font-normal">Mode</Label>
+            <ThemeToggle
+              value={settings.theme}
+              onChange={(theme) => {
+                applyMode(theme);
+                patch({ theme });
+              }}
+            />
           </div>
         </CardContent>
       </Card>

@@ -11,8 +11,9 @@ in extension storage.
 
 The popup and options pages are built with **React + [shadcn/ui](https://ui.shadcn.com)**
 (Tailwind CSS v4) in a bubbly, GNOME/Material-You-inspired layout: rounded
-section cards floating on a muted background. Light/dark mode follows your OS
-automatically; the action color is shadcn's green theme.
+section cards floating on a muted background. An Auto / Light / Dark theme
+toggle is available in both the popup and options page (Auto follows your OS);
+the action color is shadcn's green theme.
 
 ## Features
 
@@ -33,7 +34,8 @@ automatically; the action color is shadcn's green theme.
 - **Screenshot audit log** — each sweep that clicked something adds a log entry
   (which buttons, page, time) plus a JPEG screenshot of the visible tab.
   Browse, zoom, and clear it from the options page.
-- **Light & dark mode** — follows your OS automatically.
+- **Light & dark mode** — Auto / Light / Dark toggle in the popup and options
+  page; Auto follows your OS.
 - **Badge** shows how many tabs are currently being watched, or `off` when the
   extension is paused.
 

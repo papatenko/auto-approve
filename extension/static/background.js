@@ -18,6 +18,7 @@ const DEFAULTS = {
   captureShots: true,
   maxLogEntries: 100,
   maxScreenshots: 30,
+  theme: 'auto',
 };
 
 const TAB_GROUP_TITLE = 'Auto-Approve';
@@ -260,6 +261,13 @@ async function handleMessage(msg, sender) {
       settings.intervalSec = sec;
       await api.storage.local.set({ settings });
       return { ok: true, intervalSec: sec };
+    }
+
+    case 'popup:setTheme': {
+      const settings = await getSettings();
+      settings.theme = ['light', 'dark'].includes(msg.theme) ? msg.theme : 'auto';
+      await api.storage.local.set({ settings });
+      return { ok: true };
     }
 
     case 'popup:watchTab': {

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { api, send, type Settings } from '@/lib/ext';
+import { applyMode, type Mode } from '@/lib/theme';
 
 interface PopupState {
   settings: Settings;
@@ -33,7 +35,9 @@ export function Popup() {
   const [state, setState] = useState<PopupState | null>(null);
 
   const refresh = useCallback(async () => {
-    setState(await send<PopupState>({ type: 'popup:getState' }));
+    const next = await send<PopupState>({ type: 'popup:getState' });
+    applyMode(next.settings.theme);
+    setState(next);
   }, []);
 
   useEffect(() => {
@@ -63,6 +67,12 @@ export function Popup() {
   const setGroup = async (join: boolean) => {
     if (state.tabId === null) return;
     await send({ type: 'popup:groupTab', tabId: state.tabId, join });
+    refresh();
+  };
+
+  const setTheme = async (theme: Mode) => {
+    applyMode(theme);
+    await send({ type: 'popup:setTheme', theme });
     refresh();
   };
 
@@ -152,6 +162,13 @@ export function Popup() {
           {status}
         </p>
       </section>
+
+      <Bubble>
+        <Row>
+          <Label>Appearance</Label>
+          <ThemeToggle value={settings.theme} onChange={setTheme} />
+        </Row>
+      </Bubble>
 
       <footer className="px-2 pb-1">
         <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={() => api.runtime.openOptionsPage()}>
