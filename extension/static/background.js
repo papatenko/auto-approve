@@ -278,23 +278,6 @@ async function handleMessage(msg, sender) {
       return { ok: true, intervalSec: sec };
     }
 
-    case 'popup:setTheme': {
-      const settings = await getSettings();
-      settings.theme = ['light', 'dark'].includes(msg.theme) ? msg.theme : 'auto';
-      await api.storage.local.set({ settings });
-      return { ok: true };
-    }
-
-    case 'popup:setAccent': {
-      const settings = await getSettings();
-      settings.accent = Object.prototype.hasOwnProperty.call(ACCENT_BADGE_COLORS, msg.accent)
-        ? msg.accent
-        : DEFAULTS.accent;
-      await api.storage.local.set({ settings });
-      await updateBadge();
-      return { ok: true };
-    }
-
     case 'popup:watchTab': {
       const manual = await getManualTabs();
       const idx = manual.indexOf(msg.tabId);

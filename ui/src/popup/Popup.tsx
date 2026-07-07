@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Minus, Plus } from 'lucide-react';
 
-import { AppearanceRow } from '@/components/appearance';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { api, send, type Settings } from '@/lib/ext';
-import { applyAppearance, type Mode } from '@/lib/theme';
+import { applyAppearance } from '@/lib/theme';
 
 interface PopupState {
   settings: Settings;
@@ -24,10 +24,12 @@ interface PopupState {
 
 export function Popup() {
   const [state, setState] = useState<PopupState | null>(null);
+  const [intervalDraft, setIntervalDraft] = useState('');
 
   const refresh = useCallback(async () => {
     const next = await send<PopupState>({ type: 'popup:getState' });
     applyAppearance(next.settings.theme, next.settings.accent);
+    setIntervalDraft(String(next.settings.intervalSec));
     setState(next);
   }, []);
 
@@ -44,8 +46,13 @@ export function Popup() {
     refresh();
   };
 
-  const setInterval = async (value: string) => {
-    await send({ type: 'popup:setInterval', intervalSec: Number(value) });
+  const setInterval = async (value: string | number) => {
+    const parsed = Number(value);
+    const intervalSec = Number.isFinite(parsed)
+      ? Math.min(60, Math.max(2, parsed))
+      : settings.intervalSec;
+    setIntervalDraft(String(intervalSec));
+    await send({ type: 'popup:setInterval', intervalSec });
     refresh();
   };
 
@@ -58,18 +65,6 @@ export function Popup() {
   const setGroup = async (join: boolean) => {
     if (state.tabId === null) return;
     await send({ type: 'popup:groupTab', tabId: state.tabId, join });
-    refresh();
-  };
-
-  const setTheme = async (theme: Mode) => {
-    applyAppearance(theme, settings.accent);
-    await send({ type: 'popup:setTheme', theme });
-    refresh();
-  };
-
-  const setAccent = async (accent: string) => {
-    applyAppearance(settings.theme, accent);
-    await send({ type: 'popup:setAccent', accent });
     refresh();
   };
 
@@ -116,16 +111,37 @@ export function Popup() {
         <div className="flex items-center justify-between py-1.5">
           <Label htmlFor="interval">Scan every</Label>
           <div className="flex items-center gap-1.5">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Decrease scan interval"
+              className="size-8"
+              onClick={() => setInterval(settings.intervalSec - 1)}
+            >
+              <Minus className="size-3.5" />
+            </Button>
             <Input
               id="interval"
-              type="number"
-              min={2}
-              max={60}
-              className="h-8 w-16 text-right"
-              defaultValue={settings.intervalSec}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              className="h-8 w-10 px-2 text-center"
+              value={intervalDraft}
+              onChange={(e) => setIntervalDraft(e.target.value.replace(/\D/g, ''))}
               onBlur={(e) => setInterval(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && setInterval((e.target as HTMLInputElement).value)}
             />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Increase scan interval"
+              className="size-8"
+              onClick={() => setInterval(settings.intervalSec + 1)}
+            >
+              <Plus className="size-3.5" />
+            </Button>
             <span className="text-muted-foreground">s</span>
           </div>
         </div>
@@ -159,12 +175,6 @@ export function Popup() {
       <p className={`mt-2 min-h-4 text-xs ${state.watched && settings.enabled ? 'font-medium text-primary' : 'text-muted-foreground'}`}>
         {status}
       </p>
-
-      <Separator className="my-2" />
-
-      <AppearanceRow theme={settings.theme} accent={settings.accent} onTheme={setTheme} onAccent={setAccent} />
-
-      <Separator className="my-2" />
 
       <Button
         variant="link"

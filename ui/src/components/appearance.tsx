@@ -1,4 +1,3 @@
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ACCENTS, type Mode } from '@/lib/theme';
 import { cn } from '@/lib/utils';
@@ -52,28 +51,6 @@ export function AccentPicker({
           style={{ backgroundColor: a.swatch }}
         />
       ))}
-    </div>
-  );
-}
-
-export function AppearanceRow({
-  theme,
-  accent,
-  onTheme,
-  onAccent,
-}: {
-  theme: Mode;
-  accent: string;
-  onTheme: (mode: Mode) => void;
-  onAccent: (accent: string) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-2.5">
-      <div className="flex items-center justify-between gap-2">
-        <Label className="text-muted-foreground font-normal">Appearance</Label>
-        <ModeSelect value={theme} onChange={onTheme} />
-      </div>
-      <AccentPicker value={accent} onChange={onAccent} />
     </div>
   );
 }
