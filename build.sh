@@ -5,9 +5,9 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 if [ ! -d ui/node_modules ]; then
-  npm --prefix ui install --no-audit --no-fund
+  pnpm --dir ui install --frozen-lockfile
 fi
-npm --prefix ui run build
+pnpm --dir ui run build
 
 rm -rf dist
 for target in chrome firefox; do
